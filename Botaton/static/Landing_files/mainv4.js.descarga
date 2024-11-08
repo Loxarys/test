@@ -1,0 +1,152 @@
+var url = 'https://www.brincus.com/';
+
+var date_reproducciones = '';
+var date_session = new Date();
+var interval = '';
+
+function httpRequest(url, callback) {
+    const http = new XMLHttpRequest();
+    http.open("GET", url);
+    http.send();
+
+    http.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            callback.apply(http);
+        }
+    };
+}
+
+function alertaBrincus(mensaje){
+  $('#body-module-alert').html('<p style="font-size:large">'+mensaje+'</p>');
+  $('#alertaBrincus').modal({
+      show: true
+  });
+}
+
+function temporizador(id,idcarr,rut) {
+    clearInterval(interval);
+    httpRequest(url + "micuenta/temporizadorCurso/" + id, function (e) {
+        var data = JSON.parse(this.responseText);
+        $.each(data, function (i, item) {
+            date_reproducciones = item.fecha_termino;
+            //if(item.rut === '16.874.886-8' || item.rut === '16.859.089-K' || item.rut === '19.080.755-K'){
+            //}else{
+            corre_tiempo(item.activo, item.idcurso, id,idcarr,rut,item.nro);
+            //}
+        });
+    });
+}
+
+function verVideoLiberado(id){
+    var dataURL = url + 'cursos/verVideoLiberado/' + id ;
+    $('#body-module').load(dataURL, function () {
+        $('#modulosModal').modal({
+            show: true
+        });
+    });
+}
+
+function modal_profesor(modal) {
+    var dataURL = url + 'index/abreModal/' + modal;
+    $('#body-module-index').load(dataURL, function () {
+        $('#indexModal').modal({
+            show: true
+        });
+    });
+}
+function abreMaterial(id) {
+    var dataURL = url + 'micuenta/abreMaterial/' + id;
+    $('#body-module-dl').load(dataURL, function () {
+        $('#modalDownload').modal({
+            show: true
+        });
+    });
+}
+
+//Inicio código Felipe
+function abreListaCurso(pantalla, material, idcurso){
+    var dataURL = url + 'colegio/' + pantalla + '/' +material+ '/' +idcurso;
+    $("#body-cuenta-c").html('');
+    $("#body-cuenta-c").load(dataURL, function () {
+    });
+}
+
+function abreListaMaterial(pantalla, material){
+    var dataURL = url + 'colegio/' + pantalla + '/' +material;
+    $("#body-cuenta-c").html('');
+    $("#body-cuenta-c").load(dataURL, function () {
+    });
+}
+
+function cuentaApoderados(pantalla) {
+    $(".nav-item").removeClass('active');
+    $("#" + pantalla).addClass('active');
+    var dataURL = url + 'cuenta/' + pantalla;
+    $("#body-cuenta-c").html('');
+    $("#body-cuenta-c").load(dataURL, function () {
+    });
+}
+
+//Fin código Felipe
+
+
+
+function cuentaColegio(pantalla) {
+    $(".nav-item").removeClass('active');
+    if(pantalla.includes('biblioteca')){
+        $("#biblioteca").addClass('active');
+    }else{
+        $("#" + pantalla).addClass('active');
+    }
+    var dataURL = url + 'colegio/' + pantalla;
+    $("#body-cuenta-c").html('');
+    $("#body-cuenta-c").load(dataURL, function () {
+    });
+}
+
+function cuentaDocentes(pantalla) {
+    $(".nav-item").removeClass('active');
+    $("#" + pantalla).addClass('active');
+    var dataURL = url + 'docentes/' + pantalla;
+    $("#body-cuenta-d").html('');
+    $("#body-cuenta-d").load(dataURL, function () {
+    });
+}
+
+function resultadoBusqueda() {
+    if ($("#carrera").val() !== '') {
+      var uni = $("#univ").val();
+      var car = $("#carrera").val();
+      var url2 = '';
+      if (uni !== '') {
+          url2 += uni + '/';
+          if (car !== '') {
+              url2 += car + '/';
+          }
+      }
+      window.location = url + 'cursos/resultado/' + url2;
+    }
+    else {
+      alert("Debes seleccionar la carrera");
+    }
+
+}
+
+
+function corre_tiempo(activo, idc, id,idcarr,rut,nro) {
+    if (activo) {
+        $("#tiempoVideo").html('<div class="alert alert-warning">&nbsp;<i class="fas fa-info-circle"></i> <strong>Número de reproducción: ' + nro + '</strong></div>');
+    } else {
+        window.location = url + "micuenta/curso/" + idc + "/" + idcarr + "/" + id;
+    }
+}
+
+
+function abreModal(modal) {
+    var dataURL = url + 'index/abreModal/' + modal;
+    $('#body-module-index').load(dataURL, function () {
+        $('#indexModal').modal({
+            show: true
+        });
+    });
+}
